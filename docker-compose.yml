@@ -1,0 +1,27 @@
+services:
+    frontend:
+        image: node:14
+        command: bash -c "yarn prod || (yarn && yarn prod)"
+        working_dir: /home/node/frontend
+        depends_on:
+            - backend
+        volumes:
+            - ./frontend:/home/node/frontend
+    nginx:
+        image: nginx:alpine
+        command: nginx -g "daemon off;"
+        volumes:
+            - ./nginx.conf:/etc/nginx/nginx.conf
+            - ./frontend/out:/usr/share/nginx/html
+        depends_on:
+            - frontend
+        ports:
+            - 80:80
+    backend:
+        image: node:14
+        command: bash -c "node server.js"
+        working_dir: /home/node/backend
+        volumes:
+            - ./backend:/home/node/backend
+        ports:
+            - 8080:8080
